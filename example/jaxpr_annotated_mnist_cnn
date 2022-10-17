@@ -1,0 +1,765 @@
+{ lambda ; a:i32[] b:f32[32] c:f32[3,3,1,32] d:f32[64] e:f32[3,3,32,64] f:f32[256]
+    g:f32[3136,256] h:f32[10] i:f32[256,10] j:f32[32] k:f32[3,3,1,32] l:f32[64] m:f32[3,3,32,64]
+    n:f32[256] o:f32[3136,256] p:f32[10] q:f32[256,10] r:f32[128,28,28,1] s:u8[128]. let
+    t:i32[] u:f32[32] v:f32[3,3,1,32] w:f32[64] x:f32[3,3,32,64] y:f32[256] z:f32[3136,256]
+      ba:f32[10] bb:f32[256,10] bc:f32[32] bd:f32[3,3,1,32] be:f32[64] bf:f32[3,3,32,64]
+      bg:f32[256] bh:f32[3136,256] bi:f32[10] bj:f32[256,10] bk:f32[] bl:f32[] = xla_call[                              # mnist_cnn_profile.py:137 (<module>)
+      call_jaxpr={ lambda ; bm:i32[] bn:f32[32] bo:f32[3,3,1,32] bp:f32[64] bq:f32[3,3,32,64]
+          br:f32[256] bs:f32[3136,256] bt:f32[10] bu:f32[256,10] bv:f32[32] bw:f32[3,3,1,32]
+          bx:f32[64] by:f32[3,3,32,64] bz:f32[256] ca:f32[3136,256] cb:f32[10] cc:f32[256,10]
+          cd:f32[128,28,28,1] ce:u8[128]. let
+          cf:f32[128,28,28,32] = conv_general_dilated[                                                                  # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/flax/linen/linear.py:435 (__call__)
+                                                                                                                        # [jvp(CNN)/Conv_0]
+            batch_group_count=1
+            dimension_numbers=ConvDimensionNumbers(lhs_spec=(0, 3, 1, 2), rhs_spec=(3, 2, 0, 1), out_spec=(0, 3, 1, 2))
+            feature_group_count=1
+            lhs_dilation=(1, 1)
+            lhs_shape=(128, 28, 28, 1)
+            padding=((1, 1), (1, 1))
+            precision=None
+            preferred_element_type=None
+            rhs_dilation=(1, 1)
+            rhs_shape=(3, 3, 1, 32)
+            window_strides=(1, 1)
+          ] cd bo
+          cg:f32[1,1,1,32] = reshape[dimensions=None new_sizes=(1, 1, 1, 32)] bn                                        # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/flax/linen/linear.py:460 (__call__)
+                                                                                                                        # [jvp(CNN)/Conv_0]
+          ch:f32[128,28,28,32] = add cf cg                                                                              # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/flax/linen/linear.py:461 (__call__)
+                                                                                                                        # [jvp(CNN)/Conv_0]
+          ci:f32[128,28,28,32] = custom_jvp_call[                                                                       # mnist_cnn_profile.py:26 (__call__)
+                                                                                                                        # [jvp(CNN)]
+            call_jaxpr={ lambda ; cj:f32[128,28,28,32]. let
+                ck:f32[128,28,28,32] = xla_call[                                                                        # mnist_cnn_profile.py:26 (__call__)
+                  call_jaxpr={ lambda ; cl:f32[128,28,28,32]. let
+                      cm:f32[128,28,28,32] = max cl 0.0                                                                 # mnist_cnn_profile.py:26 (__call__)
+                                                                                                                        # []
+                    in (cm,) }
+                  name=relu
+                ] cj
+              in (ck,) }
+            jvp_jaxpr_thunk=<function _memoize.<locals>.memoized at 0x7f05bc51ac10>
+            num_consts=0
+          ] ch
+          cn:bool[128,28,28,32] = gt ch 0.0                                                                             # mnist_cnn_profile.py:26 (__call__)
+                                                                                                                        # [jvp(CNN)]
+          _:f32[128,28,28,32] = broadcast_in_dim[                                                                       # mnist_cnn_profile.py:26 (__call__)
+                                                                                                                        # [jvp(CNN)]
+            broadcast_dimensions=()
+            shape=(128, 28, 28, 32)
+          ] 0.0
+          co:f32[128,14,14,32] = reduce_window_sum[                                                                     # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/flax/linen/pooling.py:66 (pool)
+                                                                                                                        # [jvp(CNN)]
+            base_dilation=(1, 1, 1, 1)
+            padding=((0, 0), (0, 0), (0, 0), (0, 0))
+            window_dilation=(1, 1, 1, 1)
+            window_dimensions=(1, 2, 2, 1)
+            window_strides=(1, 2, 2, 1)
+          ] ci
+          cp:f32[] = convert_element_type[new_dtype=float32 weak_type=False] 4                                          # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/flax/linen/pooling.py:87 (avg_pool)
+                                                                                                                        # [jvp(CNN)]
+          cq:f32[128,14,14,32] = div co cp                                                                              # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/flax/linen/pooling.py:87 (avg_pool)
+                                                                                                                        # [jvp(CNN)]
+          cr:f32[128,14,14,64] = conv_general_dilated[                                                                  # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/flax/linen/linear.py:435 (__call__)
+                                                                                                                        # [jvp(CNN)/Conv_1]
+            batch_group_count=1
+            dimension_numbers=ConvDimensionNumbers(lhs_spec=(0, 3, 1, 2), rhs_spec=(3, 2, 0, 1), out_spec=(0, 3, 1, 2))
+            feature_group_count=1
+            lhs_dilation=(1, 1)
+            lhs_shape=(128, 14, 14, 32)
+            padding=((1, 1), (1, 1))
+            precision=None
+            preferred_element_type=None
+            rhs_dilation=(1, 1)
+            rhs_shape=(3, 3, 32, 64)
+            window_strides=(1, 1)
+          ] cq bq
+          cs:f32[1,1,1,64] = reshape[dimensions=None new_sizes=(1, 1, 1, 64)] bp                                        # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/flax/linen/linear.py:460 (__call__)
+                                                                                                                        # [jvp(CNN)/Conv_1]
+          ct:f32[128,14,14,64] = add cr cs                                                                              # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/flax/linen/linear.py:461 (__call__)
+                                                                                                                        # [jvp(CNN)/Conv_1]
+          cu:f32[128,14,14,64] = custom_jvp_call[                                                                       # mnist_cnn_profile.py:29 (__call__)
+                                                                                                                        # [jvp(CNN)]
+            call_jaxpr={ lambda ; cv:f32[128,14,14,64]. let
+                cw:f32[128,14,14,64] = xla_call[                                                                        # mnist_cnn_profile.py:29 (__call__)
+                  call_jaxpr={ lambda ; cx:f32[128,14,14,64]. let
+                      cy:f32[128,14,14,64] = max cx 0.0                                                                 # mnist_cnn_profile.py:29 (__call__)
+                                                                                                                        # []
+                    in (cy,) }
+                  name=relu
+                ] cv
+              in (cw,) }
+            jvp_jaxpr_thunk=<function _memoize.<locals>.memoized at 0x7f05bc51a9d0>
+            num_consts=0
+          ] ct
+          cz:bool[128,14,14,64] = gt ct 0.0                                                                             # mnist_cnn_profile.py:29 (__call__)
+                                                                                                                        # [jvp(CNN)]
+          _:f32[128,14,14,64] = broadcast_in_dim[                                                                       # mnist_cnn_profile.py:29 (__call__)
+                                                                                                                        # [jvp(CNN)]
+            broadcast_dimensions=()
+            shape=(128, 14, 14, 64)
+          ] 0.0
+          da:f32[128,7,7,64] = reduce_window_sum[                                                                       # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/flax/linen/pooling.py:66 (pool)
+                                                                                                                        # [jvp(CNN)]
+            base_dilation=(1, 1, 1, 1)
+            padding=((0, 0), (0, 0), (0, 0), (0, 0))
+            window_dilation=(1, 1, 1, 1)
+            window_dimensions=(1, 2, 2, 1)
+            window_strides=(1, 2, 2, 1)
+          ] cu
+          db:f32[] = convert_element_type[new_dtype=float32 weak_type=False] 4                                          # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/flax/linen/pooling.py:87 (avg_pool)
+                                                                                                                        # [jvp(CNN)]
+          dc:f32[128,7,7,64] = div da db                                                                                # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/flax/linen/pooling.py:87 (avg_pool)
+                                                                                                                        # [jvp(CNN)]
+          dd:f32[128,3136] = reshape[dimensions=None new_sizes=(128, 3136)] dc                                          # mnist_cnn_profile.py:31 (__call__)
+                                                                                                                        # [jvp(CNN)]
+          de:f32[128,256] = dot_general[                                                                                # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/flax/linen/linear.py:196 (__call__)
+                                                                                                                        # [jvp(CNN)/Dense_0]
+            dimension_numbers=(((1,), (0,)), ((), ()))
+            precision=None
+            preferred_element_type=None
+          ] dd bs
+          df:f32[1,256] = reshape[dimensions=None new_sizes=(1, 256)] br                                                # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/flax/linen/linear.py:200 (__call__)
+                                                                                                                        # [jvp(CNN)/Dense_0]
+          dg:f32[128,256] = add de df                                                                                   # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/flax/linen/linear.py:200 (__call__)
+                                                                                                                        # [jvp(CNN)/Dense_0]
+          dh:f32[128,256] = custom_jvp_call[                                                                            # mnist_cnn_profile.py:33 (__call__)
+                                                                                                                        # [jvp(CNN)]
+            call_jaxpr={ lambda ; di:f32[128,256]. let
+                dj:f32[128,256] = xla_call[                                                                             # mnist_cnn_profile.py:33 (__call__)
+                  call_jaxpr={ lambda ; dk:f32[128,256]. let
+                      dl:f32[128,256] = max dk 0.0                                                                      # mnist_cnn_profile.py:33 (__call__)
+                                                                                                                        # []
+                    in (dl,) }
+                  name=relu
+                ] di
+              in (dj,) }
+            jvp_jaxpr_thunk=<function _memoize.<locals>.memoized at 0x7f05bc51af70>
+            num_consts=0
+          ] dg
+          dm:bool[128,256] = gt dg 0.0                                                                                  # mnist_cnn_profile.py:33 (__call__)
+                                                                                                                        # [jvp(CNN)]
+          _:f32[128,256] = broadcast_in_dim[                                                                            # mnist_cnn_profile.py:33 (__call__)
+                                                                                                                        # [jvp(CNN)]
+            broadcast_dimensions=()
+            shape=(128, 256)
+          ] 0.0
+          dn:f32[128,10] = dot_general[                                                                                 # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/flax/linen/linear.py:196 (__call__)
+                                                                                                                        # [jvp(CNN)/Dense_1]
+            dimension_numbers=(((1,), (0,)), ((), ()))
+            precision=None
+            preferred_element_type=None
+          ] dh bu
+          do:f32[1,10] = reshape[dimensions=None new_sizes=(1, 10)] bt                                                  # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/flax/linen/linear.py:200 (__call__)
+                                                                                                                        # [jvp(CNN)/Dense_1]
+          dp:f32[128,10] = add dn do                                                                                    # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/flax/linen/linear.py:200 (__call__)
+                                                                                                                        # [jvp(CNN)/Dense_1]
+          dq:f32[128,10] = xla_call[                                                                                    # mnist_cnn_profile.py:38 (cross_entropy_loss)
+            call_jaxpr={ lambda ; dr:u8[128]. let
+                ds:u8[128,1] = broadcast_in_dim[                                                                        # mnist_cnn_profile.py:38 (cross_entropy_loss)
+                                                                                                                        # []
+                  broadcast_dimensions=(0,)
+                  shape=(128, 1)
+                ] dr
+                dt:u8[1,10] = iota[dimension=1 dtype=uint8 shape=(1, 10)]                                               # mnist_cnn_profile.py:38 (cross_entropy_loss)
+                                                                                                                        # []
+                du:bool[128,10] = eq ds dt                                                                              # mnist_cnn_profile.py:38 (cross_entropy_loss)
+                                                                                                                        # []
+                dv:f32[128,10] = convert_element_type[                                                                  # mnist_cnn_profile.py:38 (cross_entropy_loss)
+                                                                                                                        # []
+                  new_dtype=float32
+                  weak_type=False
+                ] du
+              in (dv,) }
+            name=_one_hot
+          ] ce
+          dw:f32[128,10] dx:f32[128,1] dy:f32[128,10] = xla_call[                                                       # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/loss.py:170 (softmax_cross_entropy)
+            call_jaxpr={ lambda ; dz:f32[128,10]. let
+                ea:f32[128] = reduce_max[axes=(1,)] dz                                                                  # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/loss.py:170 (softmax_cross_entropy)
+                                                                                                                        # []
+                eb:f32[128,1] = reshape[dimensions=None new_sizes=(128, 1)] ea                                          # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/loss.py:170 (softmax_cross_entropy)
+                                                                                                                        # []
+                ec:bool[128,10] = eq dz eb                                                                              # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/loss.py:170 (softmax_cross_entropy)
+                                                                                                                        # []
+                ed:f32[128,10] = convert_element_type[                                                                  # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/loss.py:170 (softmax_cross_entropy)
+                                                                                                                        # []
+                  new_dtype=float32
+                  weak_type=False
+                ] ec
+                _:f32[128] = reduce_sum[axes=(1,)] ed                                                                   # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/loss.py:170 (softmax_cross_entropy)
+                                                                                                                        # []
+                ee:f32[128,1] = broadcast_in_dim[                                                                       # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/loss.py:170 (softmax_cross_entropy)
+                                                                                                                        # []
+                  broadcast_dimensions=(0,)
+                  shape=(128, 1)
+                ] ea
+                ef:f32[128,1] = stop_gradient ee                                                                        # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/loss.py:170 (softmax_cross_entropy)
+                                                                                                                        # []
+                eg:f32[128,10] = sub dz ef                                                                              # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/loss.py:170 (softmax_cross_entropy)
+                                                                                                                        # []
+                eh:f32[128,10] = exp eg                                                                                 # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/loss.py:170 (softmax_cross_entropy)
+                                                                                                                        # []
+                ei:f32[128] = reduce_sum[axes=(1,)] eh                                                                  # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/loss.py:170 (softmax_cross_entropy)
+                                                                                                                        # []
+                ej:f32[128,1] = broadcast_in_dim[                                                                       # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/loss.py:170 (softmax_cross_entropy)
+                                                                                                                        # []
+                  broadcast_dimensions=(0,)
+                  shape=(128, 1)
+                ] ei
+                ek:f32[128,1] = log ej                                                                                  # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/loss.py:170 (softmax_cross_entropy)
+                                                                                                                        # []
+                el:f32[128,10] = sub eg ek                                                                              # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/loss.py:170 (softmax_cross_entropy)
+                                                                                                                        # []
+              in (el, ej, eh) }
+            name=log_softmax
+          ] dp
+          em:f32[128,10] = mul dq dw                                                                                    # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/loss.py:170 (softmax_cross_entropy)
+                                                                                                                        # []
+          en:f32[128] = reduce_sum[axes=(1,)] em                                                                        # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/loss.py:170 (softmax_cross_entropy)
+                                                                                                                        # []
+          eo:f32[128] = neg en                                                                                          # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/loss.py:170 (softmax_cross_entropy)
+                                                                                                                        # []
+          ep:f32[] = reduce_sum[axes=(0,)] eo                                                                           # mnist_cnn_profile.py:39 (cross_entropy_loss)
+                                                                                                                        # []
+          _:f32[] = div ep 128.0                                                                                        # mnist_cnn_profile.py:39 (cross_entropy_loss)
+                                                                                                                        # []
+          eq:f32[] = div 1.0 128.0                                                                                      # mnist_cnn_profile.py:39 (cross_entropy_loss)
+                                                                                                                        # []
+          er:f32[128] = broadcast_in_dim[broadcast_dimensions=() shape=(128,)] eq                                       # mnist_cnn_profile.py:39 (cross_entropy_loss)
+                                                                                                                        # []
+          es:f32[128] = neg er                                                                                          # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/loss.py:170 (softmax_cross_entropy)
+                                                                                                                        # []
+          et:f32[128,10] = broadcast_in_dim[                                                                            # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/loss.py:170 (softmax_cross_entropy)
+                                                                                                                        # []
+            broadcast_dimensions=(0,)
+            shape=(128, 10)
+          ] es
+          eu:f32[128,10] = mul dq et                                                                                    # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/loss.py:170 (softmax_cross_entropy)
+                                                                                                                        # []
+          ev:f32[128,10] = xla_call[                                                                                    # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/loss.py:170 (softmax_cross_entropy)
+            call_jaxpr={ lambda ; ew:f32[128,1] ex:f32[128,10] ey:f32[128,10]. let
+                ez:f32[128,10] = neg ey                                                                                 # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/loss.py:170 (softmax_cross_entropy)
+                                                                                                                        # []
+                fa:f32[128] = reduce_sum[axes=(1,)] ez                                                                  # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/loss.py:170 (softmax_cross_entropy)
+                                                                                                                        # []
+                fb:f32[128,1] = reshape[dimensions=None new_sizes=(128, 1)] fa                                          # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/loss.py:170 (softmax_cross_entropy)
+                                                                                                                        # []
+                fc:f32[128,1] = div fb ew                                                                               # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/loss.py:170 (softmax_cross_entropy)
+                                                                                                                        # []
+                fd:f32[128] = reduce_sum[axes=(1,)] fc                                                                  # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/loss.py:170 (softmax_cross_entropy)
+                                                                                                                        # []
+                fe:f32[128,10] = broadcast_in_dim[                                                                      # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/loss.py:170 (softmax_cross_entropy)
+                                                                                                                        # []
+                  broadcast_dimensions=(0,)
+                  shape=(128, 10)
+                ] fd
+                ff:f32[128,10] = mul fe ex                                                                              # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/loss.py:170 (softmax_cross_entropy)
+                                                                                                                        # []
+                fg:f32[128,10] = add_any ey ff                                                                          # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/loss.py:170 (softmax_cross_entropy)
+                                                                                                                        # []
+              in (fg,) }
+            name=log_softmax
+          ] dx dy eu
+          fh:f32[10] = reduce_sum[axes=(0,)] ev                                                                         # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/flax/linen/linear.py:200 (__call__)
+                                                                                                                        # [transpose(jvp(CNN))/Dense_1]
+          fi:f32[1,10] = reshape[dimensions=None new_sizes=(1, 10)] fh                                                  # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/flax/linen/linear.py:200 (__call__)
+                                                                                                                        # [transpose(jvp(CNN))/Dense_1]
+          fj:f32[10] = reshape[dimensions=None new_sizes=(10,)] fi                                                      # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/flax/linen/linear.py:200 (__call__)
+                                                                                                                        # [transpose(jvp(CNN))/Dense_1]
+          fk:f32[10,256] = dot_general[                                                                                 # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/flax/linen/linear.py:196 (__call__)
+                                                                                                                        # [transpose(jvp(CNN))/Dense_1]
+            dimension_numbers=(((0,), (0,)), ((), ()))
+            precision=None
+            preferred_element_type=None
+          ] ev dh
+          fl:f32[256,10] = transpose[permutation=(1, 0)] fk                                                             # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/flax/linen/linear.py:196 (__call__)
+                                                                                                                        # [transpose(jvp(CNN))/Dense_1]
+          fm:f32[128,256] = dot_general[                                                                                # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/flax/linen/linear.py:196 (__call__)
+                                                                                                                        # [transpose(jvp(CNN))/Dense_1]
+            dimension_numbers=(((1,), (1,)), ((), ()))
+            precision=None
+            preferred_element_type=None
+          ] ev bu
+          fn:f32[128,256] = broadcast_in_dim[                                                                           # mnist_cnn_profile.py:33 (__call__)
+                                                                                                                        # [transpose(jvp(CNN))]
+            broadcast_dimensions=()
+            shape=(128, 256)
+          ] 0.0
+          fo:bool[128,256] = eq dm True                                                                                 # mnist_cnn_profile.py:33 (__call__)
+                                                                                                                        # [transpose(jvp(CNN))]
+          fp:f32[128,256] = select_n fo fn fm                                                                           # mnist_cnn_profile.py:33 (__call__)
+                                                                                                                        # [transpose(jvp(CNN))]
+          fq:f32[256] = reduce_sum[axes=(0,)] fp                                                                        # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/flax/linen/linear.py:200 (__call__)
+                                                                                                                        # [transpose(jvp(CNN))/Dense_0]
+          fr:f32[1,256] = reshape[dimensions=None new_sizes=(1, 256)] fq                                                # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/flax/linen/linear.py:200 (__call__)
+                                                                                                                        # [transpose(jvp(CNN))/Dense_0]
+          fs:f32[256] = reshape[dimensions=None new_sizes=(256,)] fr                                                    # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/flax/linen/linear.py:200 (__call__)
+                                                                                                                        # [transpose(jvp(CNN))/Dense_0]
+          ft:f32[256,3136] = dot_general[                                                                               # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/flax/linen/linear.py:196 (__call__)
+                                                                                                                        # [transpose(jvp(CNN))/Dense_0]
+            dimension_numbers=(((0,), (0,)), ((), ()))
+            precision=None
+            preferred_element_type=None
+          ] fp dd
+          fu:f32[3136,256] = transpose[permutation=(1, 0)] ft                                                           # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/flax/linen/linear.py:196 (__call__)
+                                                                                                                        # [transpose(jvp(CNN))/Dense_0]
+          fv:f32[128,3136] = dot_general[                                                                               # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/flax/linen/linear.py:196 (__call__)
+                                                                                                                        # [transpose(jvp(CNN))/Dense_0]
+            dimension_numbers=(((1,), (1,)), ((), ()))
+            precision=None
+            preferred_element_type=None
+          ] fp bs
+          fw:f32[128,7,7,64] = reshape[                                                                                 # mnist_cnn_profile.py:31 (__call__)
+                                                                                                                        # [transpose(jvp(CNN))]
+            dimensions=None
+            new_sizes=(128, 7, 7, 64)
+          ] fv
+          fx:f32[128,7,7,64] = div fw db                                                                                # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/flax/linen/pooling.py:87 (avg_pool)
+                                                                                                                        # [transpose(jvp(CNN))]
+          fy:f32[128,15,15,64] = pad[                                                                                   # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/flax/linen/pooling.py:66 (pool)
+                                                                                                                        # [transpose(jvp(CNN))]
+            padding_config=((0, 0, 0), (1, 1, 1), (1, 1, 1), (0, 0, 0))
+          ] fx 0.0
+          fz:f32[128,14,14,64] = reduce_window_sum[                                                                     # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/flax/linen/pooling.py:66 (pool)
+                                                                                                                        # [transpose(jvp(CNN))]
+            base_dilation=(1, 1, 1, 1)
+            padding=((0, 0), (0, 0), (0, 0), (0, 0))
+            window_dilation=(1, 1, 1, 1)
+            window_dimensions=(1, 2, 2, 1)
+            window_strides=(1, 1, 1, 1)
+          ] fy
+          ga:f32[128,14,14,64] = broadcast_in_dim[                                                                      # mnist_cnn_profile.py:29 (__call__)
+                                                                                                                        # [transpose(jvp(CNN))]
+            broadcast_dimensions=()
+            shape=(128, 14, 14, 64)
+          ] 0.0
+          gb:bool[128,14,14,64] = eq cz True                                                                            # mnist_cnn_profile.py:29 (__call__)
+                                                                                                                        # [transpose(jvp(CNN))]
+          gc:f32[128,14,14,64] = select_n gb ga fz                                                                      # mnist_cnn_profile.py:29 (__call__)
+                                                                                                                        # [transpose(jvp(CNN))]
+          gd:f32[64] = reduce_sum[axes=(0, 1, 2)] gc                                                                    # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/flax/linen/linear.py:461 (__call__)
+                                                                                                                        # [transpose(jvp(CNN))/Conv_1]
+          ge:f32[1,1,1,64] = reshape[dimensions=None new_sizes=(1, 1, 1, 64)] gd                                        # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/flax/linen/linear.py:461 (__call__)
+                                                                                                                        # [transpose(jvp(CNN))/Conv_1]
+          gf:f32[64] = reshape[dimensions=None new_sizes=(64,)] ge                                                      # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/flax/linen/linear.py:460 (__call__)
+                                                                                                                        # [transpose(jvp(CNN))/Conv_1]
+          gg:f32[3,3,32,64] = conv_general_dilated[                                                                     # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/flax/linen/linear.py:435 (__call__)
+                                                                                                                        # [transpose(jvp(CNN))/Conv_1]
+            batch_group_count=1
+            dimension_numbers=ConvDimensionNumbers(lhs_spec=(3, 0, 1, 2), rhs_spec=(3, 0, 1, 2), out_spec=(2, 3, 0, 1))
+            feature_group_count=1
+            lhs_dilation=(1, 1)
+            lhs_shape=(128, 14, 14, 32)
+            padding=((1, 1), (1, 1))
+            precision=None
+            preferred_element_type=None
+            rhs_dilation=(1, 1)
+            rhs_shape=(128, 14, 14, 64)
+            window_strides=(1, 1)
+          ] cq gc
+          gh:f32[3,3,32,64] = rev[dimensions=(0, 1)] bq                                                                 # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/flax/linen/linear.py:435 (__call__)
+                                                                                                                        # [transpose(jvp(CNN))/Conv_1]
+          gi:f32[128,14,14,32] = conv_general_dilated[                                                                  # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/flax/linen/linear.py:435 (__call__)
+                                                                                                                        # [transpose(jvp(CNN))/Conv_1]
+            batch_group_count=1
+            dimension_numbers=ConvDimensionNumbers(lhs_spec=(0, 3, 1, 2), rhs_spec=(2, 3, 0, 1), out_spec=(0, 3, 1, 2))
+            feature_group_count=1
+            lhs_dilation=(1, 1)
+            lhs_shape=(128, 14, 14, 64)
+            padding=((1, 1), (1, 1))
+            precision=None
+            preferred_element_type=None
+            rhs_dilation=(1, 1)
+            rhs_shape=(3, 3, 32, 64)
+            window_strides=(1, 1)
+          ] gc gh
+          gj:f32[128,14,14,32] = div gi cp                                                                              # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/flax/linen/pooling.py:87 (avg_pool)
+                                                                                                                        # [transpose(jvp(CNN))]
+          gk:f32[128,29,29,32] = pad[                                                                                   # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/flax/linen/pooling.py:66 (pool)
+                                                                                                                        # [transpose(jvp(CNN))]
+            padding_config=((0, 0, 0), (1, 1, 1), (1, 1, 1), (0, 0, 0))
+          ] gj 0.0
+          gl:f32[128,28,28,32] = reduce_window_sum[                                                                     # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/flax/linen/pooling.py:66 (pool)
+                                                                                                                        # [transpose(jvp(CNN))]
+            base_dilation=(1, 1, 1, 1)
+            padding=((0, 0), (0, 0), (0, 0), (0, 0))
+            window_dilation=(1, 1, 1, 1)
+            window_dimensions=(1, 2, 2, 1)
+            window_strides=(1, 1, 1, 1)
+          ] gk
+          gm:f32[128,28,28,32] = broadcast_in_dim[                                                                      # mnist_cnn_profile.py:26 (__call__)
+                                                                                                                        # [transpose(jvp(CNN))]
+            broadcast_dimensions=()
+            shape=(128, 28, 28, 32)
+          ] 0.0
+          gn:bool[128,28,28,32] = eq cn True                                                                            # mnist_cnn_profile.py:26 (__call__)
+                                                                                                                        # [transpose(jvp(CNN))]
+          go:f32[128,28,28,32] = select_n gn gm gl                                                                      # mnist_cnn_profile.py:26 (__call__)
+                                                                                                                        # [transpose(jvp(CNN))]
+          gp:f32[32] = reduce_sum[axes=(0, 1, 2)] go                                                                    # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/flax/linen/linear.py:461 (__call__)
+                                                                                                                        # [transpose(jvp(CNN))/Conv_0]
+          gq:f32[1,1,1,32] = reshape[dimensions=None new_sizes=(1, 1, 1, 32)] gp                                        # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/flax/linen/linear.py:461 (__call__)
+                                                                                                                        # [transpose(jvp(CNN))/Conv_0]
+          gr:f32[32] = reshape[dimensions=None new_sizes=(32,)] gq                                                      # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/flax/linen/linear.py:460 (__call__)
+                                                                                                                        # [transpose(jvp(CNN))/Conv_0]
+          gs:f32[3,3,1,32] = conv_general_dilated[                                                                      # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/flax/linen/linear.py:435 (__call__)
+                                                                                                                        # [transpose(jvp(CNN))/Conv_0]
+            batch_group_count=1
+            dimension_numbers=ConvDimensionNumbers(lhs_spec=(3, 0, 1, 2), rhs_spec=(3, 0, 1, 2), out_spec=(2, 3, 0, 1))
+            feature_group_count=1
+            lhs_dilation=(1, 1)
+            lhs_shape=(128, 28, 28, 1)
+            padding=((1, 1), (1, 1))
+            precision=None
+            preferred_element_type=None
+            rhs_dilation=(1, 1)
+            rhs_shape=(128, 28, 28, 32)
+            window_strides=(1, 1)
+          ] cd go
+          gt:f32[32] = mul 0.8999999761581421 bv                                                                        # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/transform.py:70 (<lambda>)
+                                                                                                                        # []
+          gu:f32[32] = add gr gt                                                                                        # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/transform.py:70 (<lambda>)
+                                                                                                                        # []
+          gv:f32[3,3,1,32] = mul 0.8999999761581421 bw                                                                  # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/transform.py:70 (<lambda>)
+                                                                                                                        # []
+          gw:f32[3,3,1,32] = add gs gv                                                                                  # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/transform.py:70 (<lambda>)
+                                                                                                                        # []
+          gx:f32[64] = mul 0.8999999761581421 bx                                                                        # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/transform.py:70 (<lambda>)
+                                                                                                                        # []
+          gy:f32[64] = add gf gx                                                                                        # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/transform.py:70 (<lambda>)
+                                                                                                                        # []
+          gz:f32[3,3,32,64] = mul 0.8999999761581421 by                                                                 # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/transform.py:70 (<lambda>)
+                                                                                                                        # []
+          ha:f32[3,3,32,64] = add gg gz                                                                                 # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/transform.py:70 (<lambda>)
+                                                                                                                        # []
+          hb:f32[256] = mul 0.8999999761581421 bz                                                                       # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/transform.py:70 (<lambda>)
+                                                                                                                        # []
+          hc:f32[256] = add fs hb                                                                                       # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/transform.py:70 (<lambda>)
+                                                                                                                        # []
+          hd:f32[3136,256] = mul 0.8999999761581421 ca                                                                  # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/transform.py:70 (<lambda>)
+                                                                                                                        # []
+          he:f32[3136,256] = add fu hd                                                                                  # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/transform.py:70 (<lambda>)
+                                                                                                                        # []
+          hf:f32[10] = mul 0.8999999761581421 cb                                                                        # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/transform.py:70 (<lambda>)
+                                                                                                                        # []
+          hg:f32[10] = add fj hf                                                                                        # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/transform.py:70 (<lambda>)
+                                                                                                                        # []
+          hh:f32[256,10] = mul 0.8999999761581421 cc                                                                    # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/transform.py:70 (<lambda>)
+                                                                                                                        # []
+          hi:f32[256,10] = add fl hh                                                                                    # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/transform.py:70 (<lambda>)
+                                                                                                                        # []
+          hj:f32[32] = mul -0.10000000149011612 gu                                                                      # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/transform.py:405 (<lambda>)
+                                                                                                                        # []
+          hk:f32[3,3,1,32] = mul -0.10000000149011612 gw                                                                # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/transform.py:405 (<lambda>)
+                                                                                                                        # []
+          hl:f32[64] = mul -0.10000000149011612 gy                                                                      # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/transform.py:405 (<lambda>)
+                                                                                                                        # []
+          hm:f32[3,3,32,64] = mul -0.10000000149011612 ha                                                               # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/transform.py:405 (<lambda>)
+                                                                                                                        # []
+          hn:f32[256] = mul -0.10000000149011612 hc                                                                     # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/transform.py:405 (<lambda>)
+                                                                                                                        # []
+          ho:f32[3136,256] = mul -0.10000000149011612 he                                                                # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/transform.py:405 (<lambda>)
+                                                                                                                        # []
+          hp:f32[10] = mul -0.10000000149011612 hg                                                                      # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/transform.py:405 (<lambda>)
+                                                                                                                        # []
+          hq:f32[256,10] = mul -0.10000000149011612 hi                                                                  # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/transform.py:405 (<lambda>)
+                                                                                                                        # []
+          hr:f32[32] = add bn hj                                                                                        # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/update.py:43 (<lambda>)
+                                                                                                                        # []
+          hs:f32[3,3,1,32] = add bo hk                                                                                  # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/update.py:43 (<lambda>)
+                                                                                                                        # []
+          ht:f32[64] = add bp hl                                                                                        # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/update.py:43 (<lambda>)
+                                                                                                                        # []
+          hu:f32[3,3,32,64] = add bq hm                                                                                 # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/update.py:43 (<lambda>)
+                                                                                                                        # []
+          hv:f32[256] = add br hn                                                                                       # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/update.py:43 (<lambda>)
+                                                                                                                        # []
+          hw:f32[3136,256] = add bs ho                                                                                  # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/update.py:43 (<lambda>)
+                                                                                                                        # []
+          hx:f32[10] = add bt hp                                                                                        # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/update.py:43 (<lambda>)
+                                                                                                                        # []
+          hy:f32[256,10] = add bu hq                                                                                    # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/update.py:43 (<lambda>)
+                                                                                                                        # []
+          hz:i32[] = add bm 1                                                                                           # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/flax/training/train_state.py:77 (apply_gradients)
+                                                                                                                        # []
+          ia:f32[128,10] = xla_call[                                                                                    # mnist_cnn_profile.py:38 (cross_entropy_loss)
+            call_jaxpr={ lambda ; ib:u8[128]. let
+                ic:u8[128,1] = broadcast_in_dim[                                                                        # mnist_cnn_profile.py:38 (cross_entropy_loss)
+                                                                                                                        # []
+                  broadcast_dimensions=(0,)
+                  shape=(128, 1)
+                ] ib
+                id:u8[1,10] = iota[dimension=1 dtype=uint8 shape=(1, 10)]                                               # mnist_cnn_profile.py:38 (cross_entropy_loss)
+                                                                                                                        # []
+                ie:bool[128,10] = eq ic id                                                                              # mnist_cnn_profile.py:38 (cross_entropy_loss)
+                                                                                                                        # []
+                if:f32[128,10] = convert_element_type[                                                                  # mnist_cnn_profile.py:38 (cross_entropy_loss)
+                                                                                                                        # []
+                  new_dtype=float32
+                  weak_type=False
+                ] ie
+              in (if,) }
+            name=_one_hot
+          ] ce
+          ig:f32[128,10] = xla_call[                                                                                    # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/loss.py:170 (softmax_cross_entropy)
+            call_jaxpr={ lambda ; ih:f32[128,10]. let
+                ii:f32[128] = reduce_max[axes=(1,)] ih                                                                  # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/loss.py:170 (softmax_cross_entropy)
+                                                                                                                        # []
+                ij:f32[128,1] = broadcast_in_dim[                                                                       # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/loss.py:170 (softmax_cross_entropy)
+                                                                                                                        # []
+                  broadcast_dimensions=(0,)
+                  shape=(128, 1)
+                ] ii
+                ik:f32[128,1] = stop_gradient ij                                                                        # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/loss.py:170 (softmax_cross_entropy)
+                                                                                                                        # []
+                il:f32[128,10] = sub ih ik                                                                              # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/loss.py:170 (softmax_cross_entropy)
+                                                                                                                        # []
+                im:f32[128,10] = exp il                                                                                 # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/loss.py:170 (softmax_cross_entropy)
+                                                                                                                        # []
+                in:f32[128] = reduce_sum[axes=(1,)] im                                                                  # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/loss.py:170 (softmax_cross_entropy)
+                                                                                                                        # []
+                io:f32[128,1] = broadcast_in_dim[                                                                       # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/loss.py:170 (softmax_cross_entropy)
+                                                                                                                        # []
+                  broadcast_dimensions=(0,)
+                  shape=(128, 1)
+                ] in
+                ip:f32[128,1] = log io                                                                                  # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/loss.py:170 (softmax_cross_entropy)
+                                                                                                                        # []
+                iq:f32[128,10] = sub il ip                                                                              # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/loss.py:170 (softmax_cross_entropy)
+                                                                                                                        # []
+              in (iq,) }
+            name=log_softmax
+          ] dp
+          ir:f32[128,10] = mul ia ig                                                                                    # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/loss.py:170 (softmax_cross_entropy)
+                                                                                                                        # []
+          is:f32[128] = reduce_sum[axes=(1,)] ir                                                                        # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/loss.py:170 (softmax_cross_entropy)
+                                                                                                                        # []
+          it:f32[128] = neg is                                                                                          # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/loss.py:170 (softmax_cross_entropy)
+                                                                                                                        # []
+          iu:f32[] = reduce_sum[axes=(0,)] it                                                                           # mnist_cnn_profile.py:39 (cross_entropy_loss)
+                                                                                                                        # []
+          iv:f32[] = div iu 128.0                                                                                       # mnist_cnn_profile.py:39 (cross_entropy_loss)
+                                                                                                                        # []
+          iw:i32[128] = argmax[axes=(1,) index_dtype=int32] dp                                                          # mnist_cnn_profile.py:44 (compute_metrics)
+                                                                                                                        # []
+          ix:i32[128] = convert_element_type[new_dtype=int32 weak_type=False] ce                                        # mnist_cnn_profile.py:44 (compute_metrics)
+                                                                                                                        # []
+          iy:bool[128] = eq iw ix                                                                                       # mnist_cnn_profile.py:44 (compute_metrics)
+                                                                                                                        # []
+          iz:f32[128] = convert_element_type[new_dtype=float32 weak_type=False] iy                                      # mnist_cnn_profile.py:44 (compute_metrics)
+                                                                                                                        # []
+          ja:f32[] = reduce_sum[axes=(0,)] iz                                                                           # mnist_cnn_profile.py:44 (compute_metrics)
+                                                                                                                        # []
+          jb:f32[] = div ja 128.0                                                                                       # mnist_cnn_profile.py:44 (compute_metrics)
+                                                                                                                        # []
+        in (hz, hr, hs, ht, hu, hv, hw, hx, hy, gu, gw, gy, ha, hc, he, hg, hi, jb,
+          iv) }
+      name=train_step
+    ] a b c d e f g h i j k l m n o p q r s
+  in (t, u, v, w, x, y, z, ba, bb, bc, bd, be, bf, bg, bh, bi, bj, bk, bl) }
+{ lambda ; a:f32[32] b:f32[3,3,1,32] c:f32[64] d:f32[3,3,32,64] e:f32[256] f:f32[3136,256]
+    g:f32[10] h:f32[256,10] i:f32[10000,28,28,1] j:u8[10000]. let
+    k:f32[] l:f32[] = xla_call[                                                                                         # mnist_cnn_profile.py:138 (<module>)
+      call_jaxpr={ lambda ; m:f32[32] n:f32[3,3,1,32] o:f32[64] p:f32[3,3,32,64]
+          q:f32[256] r:f32[3136,256] s:f32[10] t:f32[256,10] u:f32[10000,28,28,1]
+          v:u8[10000]. let
+          w:f32[10000,28,28,32] = conv_general_dilated[                                                                 # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/flax/linen/linear.py:435 (__call__)
+                                                                                                                        # [CNN/Conv_0]
+            batch_group_count=1
+            dimension_numbers=ConvDimensionNumbers(lhs_spec=(0, 3, 1, 2), rhs_spec=(3, 2, 0, 1), out_spec=(0, 3, 1, 2))
+            feature_group_count=1
+            lhs_dilation=(1, 1)
+            lhs_shape=(10000, 28, 28, 1)
+            padding=((1, 1), (1, 1))
+            precision=None
+            preferred_element_type=None
+            rhs_dilation=(1, 1)
+            rhs_shape=(3, 3, 1, 32)
+            window_strides=(1, 1)
+          ] u n
+          x:f32[1,1,1,32] = reshape[dimensions=None new_sizes=(1, 1, 1, 32)] m                                          # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/flax/linen/linear.py:460 (__call__)
+                                                                                                                        # [CNN/Conv_0]
+          y:f32[10000,28,28,32] = add w x                                                                               # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/flax/linen/linear.py:461 (__call__)
+                                                                                                                        # [CNN/Conv_0]
+          z:f32[10000,28,28,32] = custom_jvp_call[                                                                      # mnist_cnn_profile.py:26 (__call__)
+                                                                                                                        # [CNN]
+            call_jaxpr={ lambda ; ba:f32[10000,28,28,32]. let
+                bb:f32[10000,28,28,32] = xla_call[                                                                      # mnist_cnn_profile.py:26 (__call__)
+                  call_jaxpr={ lambda ; bc:f32[10000,28,28,32]. let
+                      bd:f32[10000,28,28,32] = max bc 0.0                                                               # mnist_cnn_profile.py:26 (__call__)
+                                                                                                                        # []
+                    in (bd,) }
+                  name=relu
+                ] ba
+              in (bb,) }
+            jvp_jaxpr_thunk=<function _memoize.<locals>.memoized at 0x7f05bc51c5e0>
+            num_consts=0
+          ] y
+          be:f32[10000,14,14,32] = reduce_window_sum[                                                                   # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/flax/linen/pooling.py:66 (pool)
+                                                                                                                        # [CNN]
+            base_dilation=(1, 1, 1, 1)
+            padding=((0, 0), (0, 0), (0, 0), (0, 0))
+            window_dilation=(1, 1, 1, 1)
+            window_dimensions=(1, 2, 2, 1)
+            window_strides=(1, 2, 2, 1)
+          ] z
+          bf:f32[] = convert_element_type[new_dtype=float32 weak_type=False] 4                                          # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/flax/linen/pooling.py:87 (avg_pool)
+                                                                                                                        # [CNN]
+          bg:f32[10000,14,14,32] = div be bf                                                                            # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/flax/linen/pooling.py:87 (avg_pool)
+                                                                                                                        # [CNN]
+          bh:f32[10000,14,14,64] = conv_general_dilated[                                                                # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/flax/linen/linear.py:435 (__call__)
+                                                                                                                        # [CNN/Conv_1]
+            batch_group_count=1
+            dimension_numbers=ConvDimensionNumbers(lhs_spec=(0, 3, 1, 2), rhs_spec=(3, 2, 0, 1), out_spec=(0, 3, 1, 2))
+            feature_group_count=1
+            lhs_dilation=(1, 1)
+            lhs_shape=(10000, 14, 14, 32)
+            padding=((1, 1), (1, 1))
+            precision=None
+            preferred_element_type=None
+            rhs_dilation=(1, 1)
+            rhs_shape=(3, 3, 32, 64)
+            window_strides=(1, 1)
+          ] bg p
+          bi:f32[1,1,1,64] = reshape[dimensions=None new_sizes=(1, 1, 1, 64)] o                                         # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/flax/linen/linear.py:460 (__call__)
+                                                                                                                        # [CNN/Conv_1]
+          bj:f32[10000,14,14,64] = add bh bi                                                                            # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/flax/linen/linear.py:461 (__call__)
+                                                                                                                        # [CNN/Conv_1]
+          bk:f32[10000,14,14,64] = custom_jvp_call[                                                                     # mnist_cnn_profile.py:29 (__call__)
+                                                                                                                        # [CNN]
+            call_jaxpr={ lambda ; bl:f32[10000,14,14,64]. let
+                bm:f32[10000,14,14,64] = xla_call[                                                                      # mnist_cnn_profile.py:29 (__call__)
+                  call_jaxpr={ lambda ; bn:f32[10000,14,14,64]. let
+                      bo:f32[10000,14,14,64] = max bn 0.0                                                               # mnist_cnn_profile.py:29 (__call__)
+                                                                                                                        # []
+                    in (bo,) }
+                  name=relu
+                ] bl
+              in (bm,) }
+            jvp_jaxpr_thunk=<function _memoize.<locals>.memoized at 0x7f05bc51cd30>
+            num_consts=0
+          ] bj
+          bp:f32[10000,7,7,64] = reduce_window_sum[                                                                     # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/flax/linen/pooling.py:66 (pool)
+                                                                                                                        # [CNN]
+            base_dilation=(1, 1, 1, 1)
+            padding=((0, 0), (0, 0), (0, 0), (0, 0))
+            window_dilation=(1, 1, 1, 1)
+            window_dimensions=(1, 2, 2, 1)
+            window_strides=(1, 2, 2, 1)
+          ] bk
+          bq:f32[] = convert_element_type[new_dtype=float32 weak_type=False] 4                                          # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/flax/linen/pooling.py:87 (avg_pool)
+                                                                                                                        # [CNN]
+          br:f32[10000,7,7,64] = div bp bq                                                                              # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/flax/linen/pooling.py:87 (avg_pool)
+                                                                                                                        # [CNN]
+          bs:f32[10000,3136] = reshape[dimensions=None new_sizes=(10000, 3136)] br                                      # mnist_cnn_profile.py:31 (__call__)
+                                                                                                                        # [CNN]
+          bt:f32[10000,256] = dot_general[                                                                              # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/flax/linen/linear.py:196 (__call__)
+                                                                                                                        # [CNN/Dense_0]
+            dimension_numbers=(((1,), (0,)), ((), ()))
+            precision=None
+            preferred_element_type=None
+          ] bs r
+          bu:f32[1,256] = reshape[dimensions=None new_sizes=(1, 256)] q                                                 # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/flax/linen/linear.py:200 (__call__)
+                                                                                                                        # [CNN/Dense_0]
+          bv:f32[10000,256] = add bt bu                                                                                 # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/flax/linen/linear.py:200 (__call__)
+                                                                                                                        # [CNN/Dense_0]
+          bw:f32[10000,256] = custom_jvp_call[                                                                          # mnist_cnn_profile.py:33 (__call__)
+                                                                                                                        # [CNN]
+            call_jaxpr={ lambda ; bx:f32[10000,256]. let
+                by:f32[10000,256] = xla_call[                                                                           # mnist_cnn_profile.py:33 (__call__)
+                  call_jaxpr={ lambda ; bz:f32[10000,256]. let
+                      ca:f32[10000,256] = max bz 0.0                                                                    # mnist_cnn_profile.py:33 (__call__)
+                                                                                                                        # []
+                    in (ca,) }
+                  name=relu
+                ] bx
+              in (by,) }
+            jvp_jaxpr_thunk=<function _memoize.<locals>.memoized at 0x7f05bc51cee0>
+            num_consts=0
+          ] bv
+          cb:f32[10000,10] = dot_general[                                                                               # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/flax/linen/linear.py:196 (__call__)
+                                                                                                                        # [CNN/Dense_1]
+            dimension_numbers=(((1,), (0,)), ((), ()))
+            precision=None
+            preferred_element_type=None
+          ] bw t
+          cc:f32[1,10] = reshape[dimensions=None new_sizes=(1, 10)] s                                                   # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/flax/linen/linear.py:200 (__call__)
+                                                                                                                        # [CNN/Dense_1]
+          cd:f32[10000,10] = add cb cc                                                                                  # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/flax/linen/linear.py:200 (__call__)
+                                                                                                                        # [CNN/Dense_1]
+          ce:f32[10000,10] = xla_call[                                                                                  # mnist_cnn_profile.py:38 (cross_entropy_loss)
+            call_jaxpr={ lambda ; cf:u8[10000]. let
+                cg:u8[10000,1] = broadcast_in_dim[                                                                      # mnist_cnn_profile.py:38 (cross_entropy_loss)
+                                                                                                                        # []
+                  broadcast_dimensions=(0,)
+                  shape=(10000, 1)
+                ] cf
+                ch:u8[1,10] = iota[dimension=1 dtype=uint8 shape=(1, 10)]                                               # mnist_cnn_profile.py:38 (cross_entropy_loss)
+                                                                                                                        # []
+                ci:bool[10000,10] = eq cg ch                                                                            # mnist_cnn_profile.py:38 (cross_entropy_loss)
+                                                                                                                        # []
+                cj:f32[10000,10] = convert_element_type[                                                                # mnist_cnn_profile.py:38 (cross_entropy_loss)
+                                                                                                                        # []
+                  new_dtype=float32
+                  weak_type=False
+                ] ci
+              in (cj,) }
+            name=_one_hot
+          ] v
+          ck:f32[10000,10] = xla_call[                                                                                  # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/loss.py:170 (softmax_cross_entropy)
+            call_jaxpr={ lambda ; cl:f32[10000,10]. let
+                cm:f32[10000] = reduce_max[axes=(1,)] cl                                                                # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/loss.py:170 (softmax_cross_entropy)
+                                                                                                                        # []
+                cn:f32[10000,1] = broadcast_in_dim[                                                                     # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/loss.py:170 (softmax_cross_entropy)
+                                                                                                                        # []
+                  broadcast_dimensions=(0,)
+                  shape=(10000, 1)
+                ] cm
+                co:f32[10000,1] = stop_gradient cn                                                                      # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/loss.py:170 (softmax_cross_entropy)
+                                                                                                                        # []
+                cp:f32[10000,10] = sub cl co                                                                            # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/loss.py:170 (softmax_cross_entropy)
+                                                                                                                        # []
+                cq:f32[10000,10] = exp cp                                                                               # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/loss.py:170 (softmax_cross_entropy)
+                                                                                                                        # []
+                cr:f32[10000] = reduce_sum[axes=(1,)] cq                                                                # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/loss.py:170 (softmax_cross_entropy)
+                                                                                                                        # []
+                cs:f32[10000,1] = broadcast_in_dim[                                                                     # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/loss.py:170 (softmax_cross_entropy)
+                                                                                                                        # []
+                  broadcast_dimensions=(0,)
+                  shape=(10000, 1)
+                ] cr
+                ct:f32[10000,1] = log cs                                                                                # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/loss.py:170 (softmax_cross_entropy)
+                                                                                                                        # []
+                cu:f32[10000,10] = sub cp ct                                                                            # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/loss.py:170 (softmax_cross_entropy)
+                                                                                                                        # []
+              in (cu,) }
+            name=log_softmax
+          ] cd
+          cv:f32[10000,10] = mul ce ck                                                                                  # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/loss.py:170 (softmax_cross_entropy)
+                                                                                                                        # []
+          cw:f32[10000] = reduce_sum[axes=(1,)] cv                                                                      # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/loss.py:170 (softmax_cross_entropy)
+                                                                                                                        # []
+          cx:f32[10000] = neg cw                                                                                        # /home/yipzlf/anaconda3/envs/jax/lib/python3.8/site-packages/optax/_src/loss.py:170 (softmax_cross_entropy)
+                                                                                                                        # []
+          cy:f32[] = reduce_sum[axes=(0,)] cx                                                                           # mnist_cnn_profile.py:39 (cross_entropy_loss)
+                                                                                                                        # []
+          cz:f32[] = div cy 10000.0                                                                                     # mnist_cnn_profile.py:39 (cross_entropy_loss)
+                                                                                                                        # []
+          da:i32[10000] = argmax[axes=(1,) index_dtype=int32] cd                                                        # mnist_cnn_profile.py:44 (compute_metrics)
+                                                                                                                        # []
+          db:i32[10000] = convert_element_type[new_dtype=int32 weak_type=False] v                                       # mnist_cnn_profile.py:44 (compute_metrics)
+                                                                                                                        # []
+          dc:bool[10000] = eq da db                                                                                     # mnist_cnn_profile.py:44 (compute_metrics)
+                                                                                                                        # []
+          dd:f32[10000] = convert_element_type[                                                                         # mnist_cnn_profile.py:44 (compute_metrics)
+                                                                                                                        # []
+            new_dtype=float32
+            weak_type=False
+          ] dc
+          de:f32[] = reduce_sum[axes=(0,)] dd                                                                           # mnist_cnn_profile.py:44 (compute_metrics)
+                                                                                                                        # []
+          df:f32[] = div de 10000.0                                                                                     # mnist_cnn_profile.py:44 (compute_metrics)
+                                                                                                                        # []
+        in (df, cz) }
+      name=eval_step
+    ] a b c d e f g h i j
+  in (k, l) }

@@ -1,0 +1,6 @@
+TF_XLA_FLAGS="--tf_xla_generate_hlo_graph=./HLO_DUMP/*"
+XLA_FLAGS="--xla_dump_to=./HLO_DUMP/" 
+XLA_FLAGS="--xla_dump_hlo_as_dot"
+XLA_FLAGS="--xla_dump_hlo_as_html"
+XLA_FLAGS="--xla_dump_hlo_as_text"
+XLA_FLAGS="--xla_dump_hlo_pass_re=.*" # dump ALL HLO passes
