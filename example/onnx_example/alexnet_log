@@ -1,0 +1,39 @@
+Exported graph: graph(%actual_input_1 : Float(10, 3, 224, 224, strides=[150528, 50176, 224, 1], requires_grad=0, device=cuda:0),
+      %learned_0 : Float(64, 3, 11, 11, strides=[363, 121, 11, 1], requires_grad=1, device=cuda:0),
+      %learned_1 : Float(64, strides=[1], requires_grad=1, device=cuda:0),
+      %learned_2 : Float(192, 64, 5, 5, strides=[1600, 25, 5, 1], requires_grad=1, device=cuda:0),
+      %learned_3 : Float(192, strides=[1], requires_grad=1, device=cuda:0),
+      %learned_4 : Float(384, 192, 3, 3, strides=[1728, 9, 3, 1], requires_grad=1, device=cuda:0),
+      %learned_5 : Float(384, strides=[1], requires_grad=1, device=cuda:0),
+      %learned_6 : Float(256, 384, 3, 3, strides=[3456, 9, 3, 1], requires_grad=1, device=cuda:0),
+      %learned_7 : Float(256, strides=[1], requires_grad=1, device=cuda:0),
+      %learned_8 : Float(256, 256, 3, 3, strides=[2304, 9, 3, 1], requires_grad=1, device=cuda:0),
+      %learned_9 : Float(256, strides=[1], requires_grad=1, device=cuda:0),
+      %learned_10 : Float(4096, 9216, strides=[9216, 1], requires_grad=1, device=cuda:0),
+      %learned_11 : Float(4096, strides=[1], requires_grad=1, device=cuda:0),
+      %learned_12 : Float(4096, 4096, strides=[4096, 1], requires_grad=1, device=cuda:0),
+      %learned_13 : Float(4096, strides=[1], requires_grad=1, device=cuda:0),
+      %learned_14 : Float(1000, 4096, strides=[4096, 1], requires_grad=1, device=cuda:0),
+      %learned_15 : Float(1000, strides=[1], requires_grad=1, device=cuda:0)):
+  %input : Float(10, 64, 55, 55, strides=[193600, 3025, 55, 1], requires_grad=0, device=cuda:0) = onnx::Conv[dilations=[1, 1], group=1, kernel_shape=[11, 11], pads=[2, 2, 2, 2], strides=[4, 4], onnx_name="Conv_0"](%actual_input_1, %learned_0, %learned_1) # /home/yipzlf/anaconda3/envs/hinps/lib/python3.8/site-packages/torch/nn/modules/conv.py:453:0
+  %onnx::MaxPool_18 : Float(10, 64, 55, 55, strides=[193600, 3025, 55, 1], requires_grad=1, device=cuda:0) = onnx::Relu[onnx_name="Relu_1"](%input) # /home/yipzlf/anaconda3/envs/hinps/lib/python3.8/site-packages/torch/nn/functional.py:1455:0
+  %input.4 : Float(10, 64, 27, 27, strides=[46656, 729, 27, 1], requires_grad=1, device=cuda:0) = onnx::MaxPool[ceil_mode=0, kernel_shape=[3, 3], pads=[0, 0, 0, 0], strides=[2, 2], onnx_name="MaxPool_2"](%onnx::MaxPool_18) # /home/yipzlf/anaconda3/envs/hinps/lib/python3.8/site-packages/torch/nn/functional.py:782:0
+  %input.8 : Float(10, 192, 27, 27, strides=[139968, 729, 27, 1], requires_grad=0, device=cuda:0) = onnx::Conv[dilations=[1, 1], group=1, kernel_shape=[5, 5], pads=[2, 2, 2, 2], strides=[1, 1], onnx_name="Conv_3"](%input.4, %learned_2, %learned_3) # /home/yipzlf/anaconda3/envs/hinps/lib/python3.8/site-packages/torch/nn/modules/conv.py:453:0
+  %onnx::MaxPool_21 : Float(10, 192, 27, 27, strides=[139968, 729, 27, 1], requires_grad=1, device=cuda:0) = onnx::Relu[onnx_name="Relu_4"](%input.8) # /home/yipzlf/anaconda3/envs/hinps/lib/python3.8/site-packages/torch/nn/functional.py:1455:0
+  %input.12 : Float(10, 192, 13, 13, strides=[32448, 169, 13, 1], requires_grad=1, device=cuda:0) = onnx::MaxPool[ceil_mode=0, kernel_shape=[3, 3], pads=[0, 0, 0, 0], strides=[2, 2], onnx_name="MaxPool_5"](%onnx::MaxPool_21) # /home/yipzlf/anaconda3/envs/hinps/lib/python3.8/site-packages/torch/nn/functional.py:782:0
+  %input.16 : Float(10, 384, 13, 13, strides=[64896, 169, 13, 1], requires_grad=0, device=cuda:0) = onnx::Conv[dilations=[1, 1], group=1, kernel_shape=[3, 3], pads=[1, 1, 1, 1], strides=[1, 1], onnx_name="Conv_6"](%input.12, %learned_4, %learned_5) # /home/yipzlf/anaconda3/envs/hinps/lib/python3.8/site-packages/torch/nn/modules/conv.py:453:0
+  %onnx::Conv_24 : Float(10, 384, 13, 13, strides=[64896, 169, 13, 1], requires_grad=1, device=cuda:0) = onnx::Relu[onnx_name="Relu_7"](%input.16) # /home/yipzlf/anaconda3/envs/hinps/lib/python3.8/site-packages/torch/nn/functional.py:1455:0
+  %input.20 : Float(10, 256, 13, 13, strides=[43264, 169, 13, 1], requires_grad=0, device=cuda:0) = onnx::Conv[dilations=[1, 1], group=1, kernel_shape=[3, 3], pads=[1, 1, 1, 1], strides=[1, 1], onnx_name="Conv_8"](%onnx::Conv_24, %learned_6, %learned_7) # /home/yipzlf/anaconda3/envs/hinps/lib/python3.8/site-packages/torch/nn/modules/conv.py:453:0
+  %onnx::Conv_26 : Float(10, 256, 13, 13, strides=[43264, 169, 13, 1], requires_grad=1, device=cuda:0) = onnx::Relu[onnx_name="Relu_9"](%input.20) # /home/yipzlf/anaconda3/envs/hinps/lib/python3.8/site-packages/torch/nn/functional.py:1455:0
+  %input.24 : Float(10, 256, 13, 13, strides=[43264, 169, 13, 1], requires_grad=0, device=cuda:0) = onnx::Conv[dilations=[1, 1], group=1, kernel_shape=[3, 3], pads=[1, 1, 1, 1], strides=[1, 1], onnx_name="Conv_10"](%onnx::Conv_26, %learned_8, %learned_9) # /home/yipzlf/anaconda3/envs/hinps/lib/python3.8/site-packages/torch/nn/modules/conv.py:453:0
+  %onnx::MaxPool_28 : Float(10, 256, 13, 13, strides=[43264, 169, 13, 1], requires_grad=1, device=cuda:0) = onnx::Relu[onnx_name="Relu_11"](%input.24) # /home/yipzlf/anaconda3/envs/hinps/lib/python3.8/site-packages/torch/nn/functional.py:1455:0
+  %input.28 : Float(10, 256, 6, 6, strides=[9216, 36, 6, 1], requires_grad=1, device=cuda:0) = onnx::MaxPool[ceil_mode=0, kernel_shape=[3, 3], pads=[0, 0, 0, 0], strides=[2, 2], onnx_name="MaxPool_12"](%onnx::MaxPool_28) # /home/yipzlf/anaconda3/envs/hinps/lib/python3.8/site-packages/torch/nn/functional.py:782:0
+  %onnx::Flatten_30 : Float(10, 256, 6, 6, strides=[9216, 36, 6, 1], requires_grad=1, device=cuda:0) = onnx::AveragePool[kernel_shape=[1, 1], strides=[1, 1], onnx_name="AveragePool_13"](%input.28) # /home/yipzlf/anaconda3/envs/hinps/lib/python3.8/site-packages/torch/nn/functional.py:1214:0
+  %input.32 : Float(10, 9216, strides=[9216, 1], requires_grad=1, device=cuda:0) = onnx::Flatten[axis=1, onnx_name="Flatten_14"](%onnx::Flatten_30) # /home/yipzlf/anaconda3/envs/hinps/lib/python3.8/site-packages/torchvision/models/alexnet.py:50:0
+  %input.36 : Float(10, 4096, strides=[4096, 1], requires_grad=1, device=cuda:0) = onnx::Gemm[alpha=1., beta=1., transB=1, onnx_name="Gemm_15"](%input.32, %learned_10, %learned_11) # /home/yipzlf/anaconda3/envs/hinps/lib/python3.8/site-packages/torch/nn/modules/linear.py:114:0
+  %onnx::Gemm_33 : Float(10, 4096, strides=[4096, 1], requires_grad=1, device=cuda:0) = onnx::Relu[onnx_name="Relu_16"](%input.36) # /home/yipzlf/anaconda3/envs/hinps/lib/python3.8/site-packages/torch/nn/functional.py:1455:0
+  %input.40 : Float(10, 4096, strides=[4096, 1], requires_grad=1, device=cuda:0) = onnx::Gemm[alpha=1., beta=1., transB=1, onnx_name="Gemm_17"](%onnx::Gemm_33, %learned_12, %learned_13) # /home/yipzlf/anaconda3/envs/hinps/lib/python3.8/site-packages/torch/nn/modules/linear.py:114:0
+  %onnx::Gemm_35 : Float(10, 4096, strides=[4096, 1], requires_grad=1, device=cuda:0) = onnx::Relu[onnx_name="Relu_18"](%input.40) # /home/yipzlf/anaconda3/envs/hinps/lib/python3.8/site-packages/torch/nn/functional.py:1455:0
+  %output1 : Float(10, 1000, strides=[1000, 1], requires_grad=1, device=cuda:0) = onnx::Gemm[alpha=1., beta=1., transB=1, onnx_name="Gemm_19"](%onnx::Gemm_35, %learned_14, %learned_15) # /home/yipzlf/anaconda3/envs/hinps/lib/python3.8/site-packages/torch/nn/modules/linear.py:114:0
+  return (%output1)
+
