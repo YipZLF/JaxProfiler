@@ -25,6 +25,8 @@ import jax.numpy as jnp
 from jax import jit, grad
 from jax import lax
 
+jax.config.update("jax_platform_name", "cpu")
+
 
 def _asarray(proto):
   return numpy_helper.to_array(proto).reshape(tuple(proto.dims))
@@ -137,14 +139,16 @@ if __name__ == "__main__":
 
   dummy_input = np.random.rand(10,3,224,224)
   dummy_input = jnp.array(dummy_input)
-  print("interpreted:")
+  # print("interpreted:")
   # print(predict(dummy_input))
 
   compiled_predict = jit(predict).lower(dummy_input).compile()
 
   print("compiled:")
-  print(compiled_predict(dummy_input))
+  print(compiled_predict(dummy_input).shape)
 
   fun = lambda inputs: jnp.sum(predict(inputs))
+  grad_fun = grad(fun)
+  jit_grad_fun = jit(grad_fun).lower(dummy_input).compile()
   print("a derivative with respect to inputs:")
-  print(grad(fun)(dummy_input))
+  print(jit_grad_fun(dummy_input).shape)

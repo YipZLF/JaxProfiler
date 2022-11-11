@@ -17,11 +17,14 @@ limitations under the License.
 
 #include <chrono>
 #include <ctime>
+#include <iomanip>
 #include <memory>
 #include <utility>
 #include <vector>
 
+#include "absl/base/dynamic_annotations.h"
 #include "absl/container/flat_hash_map.h"
+#include "absl/strings/string_view.h"
 #include "tensorflow/compiler/xla/service/custom_call_status.h"
 #include "tensorflow/compiler/xla/service/custom_call_target_registry.h"
 #include "tensorflow/compiler/xla/service/hlo_casting_utils.h"
@@ -40,70 +43,115 @@ limitations under the License.
 #include "tensorflow/core/platform/logging.h"
 namespace xla {
 
-namespace cpu_instr {
-int call_index = 0;
-} // namespace cpu_instr
+namespace jpr {
 
-void CpuInstrCallback(void *output, void **inputs,
-                      XlaCustomCallStatus *status) {
-  // const float* index = reinterpret_cast<const float*>(inputs[0]);
+enum JPrStatus { JPrOK, JPrFAIL };
+struct JPrEventArgs {
+  std::string device_type;
+  std::string call_stack;
+  JPrEventArgs(const std::string _device_type, const std::string _call_stack)
+      : device_type(_device_type), call_stack(_call_stack) {}
+};
 
-  auto ts = std::chrono::duration_cast<std::chrono::microseconds>(
-                std::chrono::system_clock::now().time_since_epoch())
-                .count();
+struct JPrEvent {
+  std::string name;
+  long long ts;
+  std::shared_ptr<JPrEventArgs> args_ptr;
+  JPrEvent(const std::string _name, const long long _ts,
+           const std::string _device_type, const std::string _call_stack)
+      : name(_name), ts(_ts) {
+    args_ptr = std::make_shared<JPrEventArgs>(_device_type, _call_stack);
+  }
+};
 
-  std::cout << "Instr call at:" << xla::cpu_instr::call_index++ << ' ';
-  std::cout << ts << std::endl;
+class JPrTracer {
+ public:
+  JPrStatus addEvent(const std::string _name, const std::string _device_type,
+                     const std::string _call_stack) {
+    auto ts = std::chrono::duration_cast<std::chrono::microseconds>(
+                  std::chrono::system_clock::now().time_since_epoch())
+                  .count();
+    _events.emplace_back(_name, ts, _device_type, _call_stack);
+
+    const auto& event = _events[_events.size() - 1];
+    std::cout << std::setw(30) << event.name << "|";
+    std::cout << std::setw(20) << std::fixed << std::setprecision(0)
+              << (double)event.ts << "|";
+    std::cout << std::setw(10) << event.args_ptr->device_type << "|";
+    std::cout << event.args_ptr->call_stack << std::endl;
+
+    return JPrOK;
+  }
+  JPrStatus Print() {
+    std::cout << std::setw(30) << "HLO Instruction Call"
+              << "|";
+    std::cout << std::setw(20) << "Time Stamp"
+              << "|";
+    std::cout << std::setw(10) << "Device Type"
+              << "|";
+    std::cout << "Call Stack" << std::endl;
+    for (const auto& event : _events) {
+      std::cout << std::setw(30) << event.name << "|";
+      std::cout << std::setw(20) << std::fixed << std::setprecision(0)
+                << (double)event.ts << "|";
+      std::cout << std::setw(10) << event.args_ptr->device_type << "|";
+      std::cout << event.args_ptr->call_stack << std::endl;
+    }
+    return JPrOK;
+  }
+
+ private:
+  std::vector<JPrEvent> _events;
+};
+
+JPrTracer jpr_tracer;
+
+}  // namespace jpr
+
+void CpuInstrCallback(void* output, void** inputs, const char* opaque,
+                      size_t opaque_len, XlaCustomCallStatus* status) {
+  auto call_name = std::string(opaque);
+  jpr::jpr_tracer.addEvent(call_name, "CPU", " - ");
 }
 
+// XLA_REGISTER_CUSTOM_CALL_TARGET_WITH_SYM(symbol, address, "Host")
 XLA_REGISTER_CUSTOM_CALL_TARGET_WITH_SYM("cpu_instrumentation_callback",
                                          &CpuInstrCallback, "Host");
 
-/*static*/ StatusOr<bool>
-HloCpuInstr::RunOnComputation(HloComputation *computation) {
+/*static*/ StatusOr<bool> HloCpuInstr::RunOnComputation(
+    HloComputation* computation) {
   bool changed = true;
 
+  // Left empty
   return changed;
 }
 StatusOr<bool> HloCpuInstr::Run(
-    HloModule *module,
-    const absl::flat_hash_set<absl::string_view> &execution_threads) {
+    HloModule* module,
+    const absl::flat_hash_set<absl::string_view>& execution_threads) {
   bool changed = true;
-
   auto main_computation = module->entry_computation();
 
-  // auto instr = Cast<HloCustomCallInstruction>(
-  //     main_computation->AddInstruction(HloInstruction::CreateCustomCall(
-  //         ShapeUtil::MakeShape(F32, {}),
-  //         /*operands=*/{},
-  //         /*custom_call_target=*/"cpu_instrumentation_callback")));
-  // instr->set_custom_call_has_side_effect(true);
-  // return changed;
-
-  std::vector<xla::HloInstruction *> instructions;
-  for (xla::HloInstruction *instruction : main_computation->instructions()) {
+  std::vector<xla::HloInstruction*> instructions;
+  for (xla::HloInstruction* instruction : main_computation->instructions()) {
     instructions.push_back(instruction);
   }
-  int instr_index = 0;
-  for (xla::HloInstruction *instruction : instructions) {
-    std::cout << instruction->name() << std::endl;
-    // xla::Array<float> index_arr = {float(instr_index++)};
-
-    // auto index = Cast<HloInstruction>(
-    //     main_computation->AddInstruction(HloInstruction::CreateParameter(
-    //         index_arr, ShapeUtil::MakeShape(F32, {}),
-    //         "instrumentation_index")));
-    // auto index = Cast<HloInstruction>(main_computation->AddInstruction(
-    //     HloInstruction::CreateConstant(LiteralUtil::CreateR0<float>())));
-
+  int instr_cnt = 0;
+  for (xla::HloInstruction* instruction : instructions) {
+    auto opaque = std::string("custom_call");
+    if (instr_cnt != 0) {
+      opaque = opaque + std::string(".") + std::to_string(instr_cnt);
+    }
+    instr_cnt++;
+    // instruction->name();
     auto instr = Cast<HloCustomCallInstruction>(
         main_computation->AddInstruction(HloInstruction::CreateCustomCall(
             ShapeUtil::MakeShape(F32, {}),
             /*operands=*/{},
-            /*custom_call_target=*/"cpu_instrumentation_callback")));
+            /*custom_call_target=*/"cpu_instrumentation_callback", opaque,
+            CustomCallApiVersion::API_VERSION_STATUS_RETURNING_UNIFIED)));
     instr->set_custom_call_has_side_effect(true);
     TF_RETURN_IF_ERROR(instruction->AddControlDependencyTo(instr));
-    for (xla::HloInstruction *user : instruction->users()) {
+    for (xla::HloInstruction* user : instruction->users()) {
       TF_RETURN_IF_ERROR(instr->AddControlDependencyTo(user));
     }
   }
@@ -111,4 +159,4 @@ StatusOr<bool> HloCpuInstr::Run(
   return changed;
 }
 
-} // namespace xla
+}  // namespace xla

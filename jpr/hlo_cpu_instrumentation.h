@@ -26,20 +26,22 @@ limitations under the License.
 namespace xla {
 
 class HloCpuInstr : public HloModulePass {
-public:
+ public:
   HloCpuInstr() {}
   ~HloCpuInstr() override {}
   absl::string_view name() const override { return "cpu_instrumentation"; }
 
   // Run CPU instrumentation on a computation.
-  static StatusOr<bool> RunOnComputation(HloComputation *computation);
+  static StatusOr<bool> RunOnComputation(HloComputation* computation);
 
   // Run the pass on the given module.
   using HloPassInterface::Run;
-  StatusOr<bool>
-  Run(HloModule *module,
-      const absl::flat_hash_set<absl::string_view> &execution_threads) override;
-};
-} // namespace xla
+  StatusOr<bool> Run(
+      HloModule* module,
+      const absl::flat_hash_set<absl::string_view>& execution_threads) override;
 
-#endif // TENSORFLOW_COMPILER_XLA_SERVICE_CPU_INSTRUMENTATION_H_
+  //  private:
+};
+}  // namespace xla
+
+#endif  // TENSORFLOW_COMPILER_XLA_SERVICE_CPU_INSTRUMENTATION_H_
