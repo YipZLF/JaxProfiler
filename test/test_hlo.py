@@ -12,10 +12,9 @@ T = 100
 
 
 def norm(x):
-    with trace.CustomTraceAnnotation():
-        x = x + 2
-        x = x * 4
-        x = x ** 2
+    x = x + 2
+    x = x * 4
+    x = x ** 2
     x = x - x.mean(0)
     return x / x.std(0)
 

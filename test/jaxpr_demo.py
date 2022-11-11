@@ -10,7 +10,7 @@ T = 10
 # def cb(s):
 
 #     print("Time {}".format(time.time()),d[s.item()])
-jax.config.update("jax_platform_name", "cpu")
+jax.config.update("jax_platform_name", "cuda")
 
 @jax.named_call
 def MySub(x):
@@ -36,17 +36,17 @@ jit_norm = jax.jit(norm)
 print(jit_norm(x))
 # lowered = jit_norm.lower(x)
 # compiled = lowered.compile()
-# # jit_norm(x)
+# jit_norm(x)
 # # for i in range(T):
 # #     print("{}:{}",i,jit_norm(x))
     
 
-# s = time.time()
-# with jax.profiler.trace("./jax_trace",create_perfetto_link=False):
-#     for i in range(T):
-#         with jax.profiler.StepTraceAnnotation("TRAINING STEP", step_num=i):
-#             jnorm_x = jit_norm(x).block_until_ready()
-# e = time.time()
-# print("JIT Norm time: {}".format((e-s)))
+s = time.time()
+with jax.profiler.trace("./jax_prof",create_perfetto_link=False):
+    for i in range(T):
+        #with jax.profiler.StepTraceAnnotation("TRAINING STEP", step_num=i):
+        jnorm_x = jit_norm(x).block_until_ready()
+e = time.time()
+print("JIT Norm time: {}".format((e-s)))
 
     
